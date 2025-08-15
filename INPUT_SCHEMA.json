@@ -1,0 +1,89 @@
+{
+    "title": "Overflow Faculty Scraper - Phase 2 Playwright",
+    "description": "AI-powered faculty directory scraper for music schools using Playwright for JavaScript-heavy sites",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "startUrls": {
+            "title": "Faculty Directory URLs",
+            "type": "array",
+            "description": "URLs of music faculty directories to scrape",
+            "editor": "requestListSources",
+            "example": [
+                "https://music.ku.edu/faculty-staff",
+                "https://music.illinois.edu/faculty",
+                "https://music.utah.edu/faculty"
+            ]
+        },
+        "maxRequestsPerCrawl": {
+            "title": "Max Requests",
+            "type": "integer",
+            "description": "Maximum number of pages to process",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100
+        },
+        "headless": {
+            "title": "Headless Mode",
+            "type": "boolean",
+            "description": "Run browser in headless mode (faster but no visual debugging)",
+            "default": true
+        },
+        "extractionMethod": {
+            "title": "Extraction Method",
+            "type": "string",
+            "description": "Which extraction method to use",
+            "enum": ["auto", "kansas", "illinois", "utah", "tabular"],
+            "enumTitles": [
+                "Auto-detect (Recommended)",
+                "Kansas-style (Drupal .views-row)",
+                "Illinois-style (Card-based)",
+                "Utah-style (Table with profile links)", 
+                "Tabular-style (Database tables)"
+            ],
+            "default": "auto"
+        },
+        "enableAuth": {
+            "title": "Enable Authentication",
+            "type": "boolean",
+            "description": "Handle login-protected faculty directories",
+            "default": false
+        },
+        "authCredentials": {
+            "title": "Authentication Credentials",
+            "type": "object",
+            "description": "Login credentials for protected directories",
+            "editor": "json",
+            "properties": {
+                "username": {
+                    "title": "Username/Email",
+                    "type": "string"
+                },
+                "password": {
+                    "title": "Password", 
+                    "type": "string",
+                    "isSecret": true
+                }
+            }
+        },
+        "waitForSelector": {
+            "title": "Wait for Selector",
+            "type": "string", 
+            "description": "CSS selector to wait for before extraction (optional)",
+            "example": ".faculty-list, .views-row"
+        },
+        "customSelectors": {
+            "title": "Custom Selectors",
+            "type": "object",
+            "description": "Override default selectors for specific sites",
+            "editor": "json",
+            "example": {
+                "nameSelector": ".faculty-name h3",
+                "titleSelector": ".position",
+                "emailSelector": "a[href*='mailto']",
+                "phoneSelector": ".contact-phone"
+            }
+        }
+    },
+    "required": ["startUrls"]
+}
