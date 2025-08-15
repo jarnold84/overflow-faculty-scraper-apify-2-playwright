@@ -160,31 +160,26 @@ class PlaywrightFacultyExtractor {
         log.info('Attempting Utah-style extraction...');
         
         const faculty = await this.page.evaluate(() => {
-            const rows = document.querySelectorAll('tr, .faculty-row, .person-row');
+            const profileLinks = document.querySelectorAll('a[href*="/faculty/"][href*=".php"]');
             
-            return Array.from(rows).map(row => {
-                const nameElement = row.querySelector('a[href*=".php"], a[href*="/people/"], a[href*="/faculty/"], td:first-child a, .name a');
-                const cells = row.querySelectorAll('td, .cell, .field');
-                
-                let title = '';
-                let email = '';
-                let phone = '';
-                
-                // Extract from table cells
-                if (cells.length > 1) {
-                    title = cells[1]?.textContent.trim() || '';
-                    email = row.querySelector('a[href^="mailto:"]')?.href.replace('mailto:', '') || '';
-                    phone = cells[2]?.textContent.trim() || '';
-                }
+            return Array.from(profileLinks).map(link => {
+                const name = link.textContent.trim();
+                if (!name || name.length < 3) return null;
                 
                 return {
-                    name: nameElement?.textContent.trim() || '',
-                    title: title,
-                    email: email,
-                    phone: phone,
-                    profileLink: nameElement?.href || ''
+                    name: name,
+                    title: '',
+                    email: '',
+                    phone: '',
+                    profileLink: link.href
                 };
-            }).filter(person => person.name);
+            }).filter(person => person && person.name);
+                    });
+
+        // DEBUG LOGGING - Add this temporarily
+        log.info(`Raw faculty found by Utah selectors: ${faculty.length}`);
+        faculty.forEach((person, index) => {
+            log.info(`Faculty ${index}: ${person.name} | ${person.title} | ${person.profileLink}`);
         });
 
         return this.processFacultyData(faculty, 'utah');
